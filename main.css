@@ -1,0 +1,567 @@
+/* fonts */
+@font-face {
+  font-family: Muse;
+  src: url(Museo700-Regular.otf);
+}
+
+/* general */
+body{
+background:url(img/background.jpg);
+overflow:auto;
+height:101%;
+font-family:verdana;
+overflow-x: hidden;
+}
+
+a{
+text-decoration:none;
+
+color:white;
+}
+
+a:hover{
+color:#30b6eb;
+}
+
+h1{
+font-family: Muse;
+position: absolute;
+color: #555;
+width: 600px;
+left: 50%;
+margin-left: -300px;
+text-align: center;
+top: 75px;;
+font-size: 50px;
+}
+
+p{
+font-family:verdana;
+}
+
+ul{
+list-style:none;
+}
+
+.logo{
+overflow:hidden;
+text-indent:10000px;
+background:url(img/logo.png);
+width:138px;
+height:60px;
+left:50%;
+margin-left:-69px;
+z-index:1;
+}
+
+.logo.center{
+position:absolute;
+left:50%;
+top: 365px;
+}
+
+/*button */
+.button_search{
+text-indent:1000px;
+overflow: hidden;
+background: #E1E5E6 url(img/search.png) no-repeat center;
+width: 42px;
+height: 42px;
+border: none;
+border-radius: 8px;
+left: 180px;
+position: absolute;
+}
+
+.button_search:hover{
+background-color:white;
+}
+
+/*icons */
+.icon_graph,
+.icon_hash,
+.icon_mention,
+.icon_quote,
+.icon_retweet {
+display: block;
+width: 42px;
+height: 42px;
+background: white no-repeat center;
+border-radius: 21px;
+position: absolute;
+overflow: hidden;
+text-indent: 1000px;
+z-index:1;
+}
+
+.icon_graph{
+background-image:url(img/icon_graph.png)
+}
+
+.icon_hash{
+background-image:url(img/icon_hash.png)
+}
+
+.icon_mention{
+background-image:url(img/icon_mention.png)
+}
+
+.icon_quote{
+background-image:url(img/icon_quote.png)
+}
+
+.icon_retweet{
+background-image:url(img/icon_retweet.png)
+}
+
+.icon_graph.head{
+left:421px; 
+top:35px;
+}
+
+.icon_hash.head{
+left: 80px;
+top: 540px;
+opacity:0;
+}
+
+.icon_mention.head{
+left: 80px;
+top: 134px;
+opacity:0;
+}
+
+.icon_quote.head{
+left:421px; 
+top:35px;
+}
+
+.icon_retweet.head{
+left: 880px;
+top: 630px;
+opacity:0;
+}
+
+/* decorations */
+.sun, .sun2{
+position: absolute;
+left: 50%;
+bottom: 0;
+background: url(img/sun.png);
+width: 376px;
+height: 276px;
+margin-left: 81px;
+}
+
+.sun2{
+background:url(img/sun2.png);
+}
+
+.mountains{
+position:absolute;
+left:50%;
+margin-left:-1000px;
+bottom:0;
+background:url(img/mountains.png) center center;
+width:2000px;
+height:200px;
+}
+
+.bird{
+background:url(img/bird.png);
+width:58px;
+height:36px;
+z-index:10;
+
+}
+
+.cloud1, .cloud2{
+position:absolute;
+width:175px;
+height:107px;
+background:url(img/cloud.png);
+left:50%;
+}
+
+.cloud1{
+margin-left: -463px;
+top: 130px;
+}
+
+.cloud2{
+margin-left: 255px;
+top: 300px;
+}
+
+/* elements */
+.search_container {
+position: absolute;
+width: 426px;
+left: 50%;
+top: 280px;
+}
+
+.search_container .bird{
+position: absolute;
+left: -202px;
+top: -18px;
+}
+
+input[type=text] {
+position:absolute;
+border-radius:8px;
+background:white;
+padding:10px 10px 10px 35px;
+border:none;
+height:22px;
+width:290px;
+margin-left:-168px;
+color:#555;
+font-size: 16px;
+
+}
+
+input[type=text].loading{
+  background-image: url(img/loader.gif);
+  background-position: 300px center;
+  background-repeat: no-repeat;
+}
+
+footer{
+width:600px;
+left:50%;
+margin-left:-300px;
+position:absolute;
+text-align:center;
+color:black;
+font-size:12px;
+bottom:0;
+z-index:3;
+}
+
+.overlayer{
+top: -720px;
+background:url(img/sowijs_final.jpg);
+position:absolute;
+display:block;
+opacity:0.0;
+width:1020px;
+height:2050px;
+left:50%;
+margin-left:-510px;
+}
+
+.profile{
+display:none;
+width: 1000px;
+height: 1000px;
+position: absolute;
+left: 50%;
+margin-left: -500px;
+top: 194px;
+opacity: 0;
+}
+
+.profile_container{
+left: 50%;
+position: absolute;
+margin-left: -103px;
+}
+
+.profile_container img{
+float:left;
+position: relative;
+}
+
+.name{
+font-size:20px;
+}
+
+.details{
+font-size:12px;
+line-height: 20px;
+}
+
+.profile_container p{
+margin-top: 4px;
+margin-bottom: 5px;
+padding-left: 100px;
+}
+
+.user{
+z-index:10;
+}
+
+h3{
+font-family: verdana;
+position: absolute;
+font-size: 13px;
+font-weight: normal;
+opacity:0;
+}
+
+.populair{
+left: 532px;
+top: 134px;
+}
+
+.statistics{
+
+left: 762px;
+top: 321px;
+}
+
+.mentions{
+left: 133px;
+top: 134px;
+}
+
+.hastags{
+left: 133px;
+top: 540px;
+}
+
+.retweet{
+left: 749px;
+top: 628px;
+}
+
+
+
+.statistics_container{
+opacity:0;
+position: absolute;
+left: 450px;
+top: 360px;
+}
+
+.statistics_container li{
+margin-bottom: 28px;
+
+}
+
+.statistics_container .bar{
+width: 110px;
+background: white;
+border-radius: 0 5px 5px 0;
+margin-left: 60px;
+height: 40px;
+padding: 0 12px;
+font-size: 12px;
+line-height: 40px;
+}
+
+.bar span{
+float:right;
+font-weight:bold;
+}
+
+.hastags_container{
+position: absolute;
+left: 84px;
+top: 607px;
+color:white;
+opacity:0;
+padding-left:5px;
+}
+
+.hastags_container li{
+margin-bottom: 17px;
+}
+
+
+.hastags_container a{
+padding:10px;
+}
+
+.hastags_container a:hover{
+background:rgba(255,255,255,0.5);
+color:black;
+border-radius:5px;
+}
+
+.retweet_container{
+position: absolute;
+left: 614px;
+top: 694px;
+color: white;
+font-size: 13px;
+opacity:0;
+}
+
+.retweet_container li{
+text-align: right;
+margin-bottom: 19px;
+}
+
+.retweet_container span{
+display: block;
+float: right;
+width: 56px;
+font-weight: bold;
+
+}
+
+.score_container{
+position: absolute;
+left: 50%;
+top: 737px;
+background: white;
+border-radius: 100px;
+width: 148px;
+height: 148px;
+margin-left: -74px;
+font-color:black;
+z-index:10;
+}
+
+.score{
+text-align: center;
+font-size: 47px;
+font-weight: bold;
+line-height: 140px;
+margin-top: -13px;
+}
+
+.button_tweet{
+z-index: 2;
+position: absolute;
+left: 140px;
+top: 67px;
+background: white;
+color: #33B6EC;
+display: block;
+width: 108px;
+border-radius: 0 5px 5px 0;
+height: 29px;
+line-height: 29px;
+text-align: right;
+padding: 0 5px;
+font-weight: bold;
+font-size: 14px;
+}
+
+.button_tweet .bird{
+left: -29px;
+top: -4px;
+position: absolute;
+
+}
+
+.score_container h4{
+margin-top: -27px;
+text-align: center;
+}
+
+.mentions_container{
+z-index:3;
+color: white;
+position: absolute;
+left: 83px;
+top: 180px;
+opacity:0;
+}
+
+.mentions_container li{
+overflow: auto;
+margin-bottom: 0px;
+height: 82px;
+padding: 10px;
+border-radius: 5px;
+}
+
+.mentions_container li:hover{
+background: rgba(255, 255, 255, 0.5);
+color: black;
+}
+
+.mentions_container img{
+margin-bottom: -40px;
+margin-right: 16px;
+
+}
+
+.mentions_container span{
+display: block;
+color: #555;
+font-size: 12px;
+margin-left: 100px;
+}
+
+.populair_container{
+opacity:0;
+color: white;
+position: absolute;
+left: 554px;
+top: 194px;
+width: 331px;
+height: 86px;
+display: block;
+background:url(img/quotes.png);
+}
+
+.populair_container p{
+width: 240px;
+margin: 21px 0 0 48px;
+height: 40px;
+font-size:12px;
+}
+
+.populair_container .retweets {
+color: #555;
+font-size: 12px;
+display: block;
+margin-top: 9px;
+padding-left: 20px;
+background: url(img/image_retweet.png) no-repeat 0 3px;
+}
+
+.line1,
+.line2,
+.line3,
+.line4,
+.line5{
+position:absolute;
+z-index:0;
+opacity:0;
+}
+
+.line1{
+left: 442px;
+top: 61px;
+width:249px;
+height:107px;
+background:url(img/line_1.png);
+}
+
+.line2{
+left: 442px;
+top: 79px;
+width:463px;
+height:276px;
+background:url(img/line_2.png);
+}
+
+.line3{
+left: 98px;
+top: 165px;
+width:403px;
+height:240px;
+background:url(img/line_3.png);
+}
+
+.line4{
+left: 113px;
+top: 467px;
+width:385px;
+height:106px;
+background:url(img/line_4.png);
+}
+
+.line5{
+left: 442px;
+top: 533px;
+width: 574px;
+height: 129px;
+background:url(img/line_5.png);
+}
