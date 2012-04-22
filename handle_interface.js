@@ -7,11 +7,11 @@
     var MOST_POPULAIR_TWEET_MESSAGE = 'Wees wijs met sowijs!'
     var MOST_POPULAIR_TWEET_RETWEET = 23
     
-    var STATISTICS_SOCIAL = '23%'
+    var STATISTICS_SOCIAL = '23'
     var STATISTICS_SOCIAL_OF_MAX = 0.2; /*0 = minimum, 1 = max*/
-    var STATISTICS_INFORMER = '52%'
+    var STATISTICS_INFORMER = '52'
     var STATISTICS_INFORMER_OF_MAX = 0.5; /*0 = minimum, 1 = max*/
-    var STATISTICS_RETWEETED = '61%'
+    var STATISTICS_RETWEETED = '61'
     var STATISTICS_RETWEETED_OF_MAX = 0.6; /*0 = minimum, 1 = max*/
     
     
@@ -37,13 +37,16 @@
       $('#most_populair_tweet_retweet').html(socialScore.mostPopularTweetNumberRetweets);
 
       $('#statistics_social').html(socialScore.mentionPercentage + '%');
-	  STATISTICS_SOCIAL_OF_MAX = socialScore.mentionFactor;
+      STATISTICS_SOCIAL = socialScore.mentionPercentage;
+	    STATISTICS_SOCIAL_OF_MAX = socialScore.mentionFactor;
 	
       $('#statistics_informer').html(socialScore.hashtagPercentage + '%');
-	  STATISTICS_INFORMER_OF_MAX = socialScore.hashtagFactor;
+	    STATISTICS_INFORMER = socialScore.hashtagPercentage;
+	    STATISTICS_INFORMER_OF_MAX = socialScore.hashtagFactor;
 
       $('#statistics_retweeted').html(socialScore.retweetAllPercentage + '%');
-	  STATISTICS_RETWEETED_OF_MAX = socialScore.retweetAllFactor;
+	    STATISTICS_RETWEETED = socialScore.retweetAllPercentage
+	    STATISTICS_RETWEETED_OF_MAX = socialScore.retweetAllFactor;
 		
       $('#social_score').html(socialScore.score);
       $('#retweet_retweets').html(socialScore.retweetOthersPercentage);
@@ -91,7 +94,7 @@
       $('#search_button').click(function(event){
         $('#user_input').addClass('loading');
         event.preventDefault();
-
+        //loadded();
 		    socialScore.calculate ($('#user_input').val(), loadded);
 
 		 
@@ -109,7 +112,7 @@
     TARGET_HEIGT = '1200';
     
     
-    var jarallax = new Jarallax('none');
+    
     var BAR_MAX_SIZE = 300;
     var BAR_MIN_SIZE = 110;
     var bar_diff = BAR_MAX_SIZE - BAR_MIN_SIZE
@@ -117,6 +120,8 @@
     
     loadded = function(){
       setValues();
+      
+      var jarallax = new Jarallax('none');
       
       var body_height = $(window).height();
       var body_difference = TARGET_HEIGT - body_height;
@@ -195,18 +200,42 @@
                                      {progress:'60', width:BAR_MIN_SIZE + 'px', style:{easing:'easeOut'}},
                                      {progress:'70', width:(bar_diff * STATISTICS_RETWEETED_OF_MAX + BAR_MIN_SIZE) + 'px'}]);
                                      
+      
+      jarallax.addCounter({selector:'#statistics_social',
+                              startNumber:0,
+                              endNumber:STATISTICS_SOCIAL,
+                              decimals:2,
+                              startProgress:'50',
+                              endProgress:'60',
+                              postCharakter:'%'});
+                              
+      jarallax.addCounter({selector:'#statistics_informer',
+                              startNumber:0,
+                              endNumber:STATISTICS_INFORMER,
+                              decimals:2,
+                              startProgress:'55',
+                              endProgress:'65',
+                              postCharakter:'%'});
+                             
+      jarallax.addCounter({selector:'#statistics_retweeted',
+                              startNumber:0,
+                              endNumber:STATISTICS_RETWEETED,
+                              decimals:2,
+                              startProgress:'60',
+                              endProgress:'70',
+                              postCharakter:'%'});
+      
       jarallax.addAnimation('.line3, .line4, .line5, .hastags_container, .mentions_container, .retweet_container, .mentions, .hastags, .retweet, .icon_mention.head, .icon_hash.head, .icon_retweet.head',
           [{progress:'0', opacity:'0'},
            {progress:'70', opacity:'0'},
            {progress:'85', opacity:'1'}]);
                                      
       
-      console.log(jarallax.progress);                             
       if(jarallax.progress > 0.9) {
         jarallax.setProgress(10/85)
-        jarallax.jumpToProgress(1, 4000, 60, true);
+        jarallax.jumpToProgress('100%', 4000, 60, true);
       }else{
-        jarallax.jumpToProgress(1, 6000, 60, true);
+        jarallax.jumpToProgress('100%', 8000, 60, true);
       }
     }
     
