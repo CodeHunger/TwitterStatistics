@@ -1,34 +1,42 @@
 /*!
  * do not redistrobute 
  * jaralax library
- * version: 0.2.1a closed version
+ * version: 0.2.2 public beta
  * http://jarallax.com/
  *
  * Copyright 2012, Jacko Hoogeveen
  * Dual licensed under the MIT or GPL Version 3 licenses.
  * http://jarallax.com/license.html
  * 
- * Date: 3/10/2012
+ * Date: 3/27/2012
  */
 
-function hasNumbers(t)
-{
-return /\d/.test(t);
+function hasNumbers(t) {
+  return /\d/.test(t);
 }
 
-function clone(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
-    var copy = obj.constructor();
-    for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-    }
-    return copy;
-}
+var isMobile = {
+  Android: function() {
+    return navigator.userAgent.match(/Android/i) ? true : false;
+  },
+  BlackBerry: function() {
+    return navigator.userAgent.match(/BlackBerry/i) ? true : false;
+  },
+  iOS: function() {
+    return navigator.userAgent.match(/iPhone|iPad|iPod/i) ? true : false;
+  },
+  Windows: function() {
+    return navigator.userAgent.match(/IEMobile/i) ? true : false;
+  },
+  any: function() {
+    return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Windows());
+  }
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // jarallax class //////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Jarallax = function(controller) {
+var Jarallax = function (controller) {
   this.jarallaxObject = [];
   this.animations = [];
   this.defaultValues = [];
@@ -37,11 +45,12 @@ Jarallax = function(controller) {
   this.maxProgress = 1;
   this.targetProgress = 0.0;
   this.timer;
+  this.allowWeakProgress = true;
 
   if (controller === undefined) {
     this.controllers.push(new ControllerScroll());
-  } else if ('none'){
-    //dont add a controller;
+  } else if(controller == 'none'){
+    
   } else {
     if (controller.length) {
       this.controllers = controller;
@@ -60,33 +69,41 @@ Jarallax = function(controller) {
 ////////////////////////////////////////////////////////////////////////////////
 // Jarallax methods ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-Jarallax.prototype.setProgress = function (progress) {
-  if(progress > 1){
+Jarallax.prototype.setProgress = function (progress, weak) {
+  weak = weak | false;
+  if(progress > 1) {
     progress = 1;
-  }else if(progress < 0){
+  }else if(progress < 0) {
     progress = 0;
   }
-  this.progress = progress; 
-  
-  for(j = 0; j < this.defaultValues.length; j++){
-    this.defaultValues[j].activate(this.progress);
+  this.progress = progress;
+  if(this.allowWeakProgress || !weak) {
+    for(j = 0; j < this.defaultValues.length; j++){
+      this.defaultValues[j].activate(this.progress);
+    }
+    
+    for(k = 0; k < this.animations.length; k++){
+      this.animations[k].activate(this.progress);
+    }
+    
+    for(l = 0; l < this.controllers.length; l++){
+      this.controllers[l].update(this.progress);
+    };
   }
-  
-  for(k = 0; k < this.animations.length; k++){
-    this.animations[k].activate(this.progress);
-  }
-  
-  for(l = 0; l < this.controllers.length; l++){
-    this.controllers[l].update(this.progress);
-  };
 };
 
+Jarallax.prototype.clearAnimations = function(){
+  this.animations = [];
+}
 
+Jarallax.prototype.clearDefaults = function(){
+  this.defaultValues = [];
+}
 
 Jarallax.prototype.jumpToProgress = function (progress, time, fps, linear) {
   var linear = linear | false;
-  if(!progress.indexOf){
-    progress = progress;
+  if(!progress.indexOf) {
+    progress = progress / this.maxProgress;
   } else if(progress.indexOf('%') != -1) {
     progress = parseFloat(progress) / 100;
   }
@@ -97,44 +114,48 @@ Jarallax.prototype.jumpToProgress = function (progress, time, fps, linear) {
     progress = 0;
   }
   
-  this.animationProperties = {};
-  this.animationProperties.timeStep = 1000 / fps;
-  this.animationProperties.steps = time / this.animationProperties.timeStep;
-  this.animationProperties.currentStep = 0;
+  this.smoothProperties = {};
+  this.smoothProperties.timeStep = 1000 / fps;
+  this.smoothProperties.steps = time / this.smoothProperties.timeStep;
+  this.smoothProperties.currentStep = 0;
   
-  this.animationProperties.startProgress = this.progress;
-  this.animationProperties.diffProgress = progress - this.progress;
-  this.animationProperties.previousValue = this.progress;
+  this.smoothProperties.startProgress = this.progress;
+  this.smoothProperties.diffProgress = progress - this.progress;
+  this.smoothProperties.previousValue = this.progress;
   
   
   if(!linear) {
-    this.animationProperties.type = "easeOut";
+    
+    this.smoothProperties.type = "easeOut";
   }else{
-    this.animationProperties.type = "linear";
+    this.smoothProperties.type = "linear";
   }
   
   this.smooth();
-}
-Jarallax.prototype.smooth = function () {
+  this.allowWeakProgress = false;
   
-  //console.log(this.animationProperties.previousValue, this.progress)
-  this.animationProperties.currentStep++;
+  return false;
+}
+
+Jarallax.prototype.smooth = function () {
+  this.smoothProperties.currentStep++;
   clearTimeout(this.timer);
-  if(this.animationProperties.currentStep < this.animationProperties.steps) {
-    var position = this.animationProperties.currentStep / this.animationProperties.steps;
-    var newProgress = Jarallax.EASING[this.animationProperties.type](position,
-                                       this.animationProperties.startProgress,
-                                       this.animationProperties.diffProgress,
+  if(this.smoothProperties.currentStep < this.smoothProperties.steps) {
+    var position = this.smoothProperties.currentStep / this.smoothProperties.steps;
+    
+    var newProgress = Jarallax.EASING[this.smoothProperties.type](position,
+                                       this.smoothProperties.startProgress,
+                                       this.smoothProperties.diffProgress,
                                        1,
                                        5);
     
     this.setProgress(newProgress);
-    this.timer = window.setTimeout(this.smooth.bind(this), this.animationProperties.timeStep);
-    this.animationProperties.previousValue = newProgress;
-    //console.log(this.progress, newProgress);
+    this.timer = window.setTimeout(this.smooth.bind(this), this.smoothProperties.timeStep);
+    this.smoothProperties.previousValue = newProgress;
   } else {
-    this.setProgress(this.animationProperties.startProgress + this.animationProperties.diffProgress);
-    delete this.animationProperties;
+    this.allowWeakProgress = true;
+    this.setProgress(this.smoothProperties.startProgress + this.smoothProperties.diffProgress);
+    delete this.smoothProperties;
   }
 };
 
@@ -165,52 +186,72 @@ Jarallax.prototype.addStatic = function (selector, values) {
   }
 };
 
+Jarallax.prototype.addCounter = function (properties) {
+  this.animations.push(new JarallaxCounter(this, properties));
+}
+
 Jarallax.prototype.addAnimation = function (selector, values) {
   if(!selector) {
     throw new Error('no selector defined.');
   }
+  
   var returnValue = [];
   if(Jarallax.isValues(values)) {
-    for(var i = 0; i < values.length - 1; i++){
-      if(values[i] && values[i + 1])
-      {
-        if(values[i]['progress'] && values[i + 1]['progress']) {
-          if(values[i + 1]['progress'].indexOf('%') == -1) {
-            if(this.maxProgress < parseInt(values[i + 1]['progress'])){
-              console.log('setting max', this.maxProgress, values[i + 1]['progress'])
-              this.maxProgress = parseInt(values[i + 1]['progress']);
+    if(values.length){
+      for(var i = 0; i < values.length - 1; i++){
+        if(values[i] && values[i + 1])
+        {
+          if(values[i]['progress'] && values[i + 1]['progress']) {
+            if(values[i + 1]['progress'].indexOf('%') == -1) {
+              if(this.maxProgress < values[i + 1]['progress']){
+                this.maxProgress = values[i + 1]['progress'];
+              }
             }
+            var newAnimation = new JarallaxAnimation(selector, values[i], values[i + 1], this)
+            this.animations.push(newAnimation);
+            returnValue.push(newAnimation);
           }
-          var newAnimation = new JarallaxAnimation(selector, values[i], values[i + 1], this)
-          this.animations.push(newAnimation);
-          returnValue.push(newAnimation);
+          else
+          {
+            throw new Error('no animation boundry found.');
+          }
         }
         else
         {
-          throw new Error('no animation boundry found.');
+          throw new Error('bad animation data.');
         }
       }
-      else
-      {
-        throw new Error('bad animation data.');
+    }else{
+      if(!values['progress']){
+        values.progress = '100%';
       }
+      var startValues = {};
+      
+      for(var j in values){
+        startValues[j] = $(selector).css(j)
+      }
+      
+      startValues['progress'] = '0%'
+      
+      
+      var newAnimation = new JarallaxAnimation(selector, startValues, values, this)
+      this.animations.push(newAnimation);
+      returnValue.push(newAnimation);
     }
   }
   return returnValue;
 };
 
 Jarallax.prototype.cloneAnimation = function (selector, adittionalValues, animations) {
-  //TODO
   if(!selector) {
     throw new Error('no selector defined.');
   }
   
   var newAnimations = [];
-  
   var adittionalValuesArray = [];
   
-  for(var i = 0; i < animations.length; i++) {
-    if(adittionalValues.length){
+  for(var i = 0; i < animations.length + 1; i++) {
+    if(adittionalValues instanceof Array){
       adittionalValuesArray.push(adittionalValues[i]);
     } else {
       adittionalValuesArray.push(adittionalValues);      
@@ -219,52 +260,52 @@ Jarallax.prototype.cloneAnimation = function (selector, adittionalValues, animat
   
   for(i = 0; i < animations.length; i++) {
     var currentAnimation = animations[i];
-    var newStart = clone(currentAnimation.startValues);
-    var newEnd = clone(currentAnimation.endValues);
+    var newStart = Jarallax.clone(currentAnimation.startValues);
+    var newEnd = Jarallax.clone(currentAnimation.endValues);
     
-    for(var j = 0; j < adittionalValuesArray.length; j++) {
-      var adittionalValue = adittionalValuesArray[j];
-      for(var addition in adittionalValue) {
-        for(start in currentAnimation.startValues) {
-          if(addition == start) {
-            newStart[addition] = Jarallax.calculateNewValue(adittionalValue[addition], currentAnimation.startValues[start]);
-            newEnd[addition] = Jarallax.calculateNewValue(adittionalValue[addition], currentAnimation.endValues[start]);
-            break;
-          }
-        }
+    var adittionalValueStart = adittionalValuesArray[i];
+    var adittionalValueEnd = adittionalValuesArray[i + 1];
+    
+    for(var j in newStart) {
+      if(adittionalValueStart[j]){
+        newStart[j] = Jarallax.calculateNewValue(adittionalValueStart[j], newStart[j]);
       }
     }
-    //console.log(this.addAnimation(selector, [newStart, newEnd])[0]);
+    
+    for(var k in newEnd) {
+      if(adittionalValueEnd[k]){
+        newEnd[k] = Jarallax.calculateNewValue(adittionalValueEnd[k], newEnd[k]);
+      }
+    }
+    
     newAnimations.push(this.addAnimation(selector, [newStart, newEnd])[0]);
+    
   }
   return newAnimations;
 }
 
 Jarallax.calculateNewValue = function (modefier, original) {
   var result;
+  var units = Jarallax.getUnits(original)
   if (modefier.indexOf('+') == 0) {
-    result = String(parseFloat(original) + parseFloat(modefier));
-  }
-  else{
+    result = String(parseFloat(original) + parseFloat(modefier) + units);
+  } else if (modefier.indexOf('-') == 0) {
+    result = String(parseFloat(original) + parseFloat(modefier) + units);
+  } else if (modefier.indexOf('*') == 0) {
+    result = String(parseFloat(original) * parseFloat(modefier.substr(1)) + units);
+  } else if (modefier.indexOf('/') == 0) {
+    result = String(parseFloat(original) / parseFloat(modefier.substr(1)) + units);
+  } else {
     result = modefier;
   }
   
-  if (original.indexOf('%')  > 0) {
-    return result + '%';
-  } else {
-    return result;
+  if(original.indexOf){
+    if(original.indexOf('%') > 0){
+      return result + '%';
+    }
   }
-  
-  
+  return result;
 }
-
-/*JarallaxAnimation = function (selector, startValues, endValues, jarallax) {
-  this.progress = 0;
-  this.selector = selector;
-  this.startValues = startValues;
-  this.endValues = endValues;
-  this.jarallax = jarallax;
-};*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // Jarallax static methods /////////////////////////////////////////////////////
@@ -288,6 +329,15 @@ Jarallax.isValues = function(object) {
 Jarallax.getUnits = function (string) {
   return string.replace(/\d+/g, '');
 };
+
+Jarallax.clone = function (obj) {
+    var newObj = {};
+    for(var i in obj){
+      newObj[i] = obj[i];
+    }
+    
+    return newObj;
+}
 
 
 Jarallax.EASING = {
@@ -331,7 +381,7 @@ Jarallax.EASING['none'] = Jarallax.EASING['linear'];
 // Jarallax animation class ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 JarallaxAnimation = function (selector, startValues, endValues, jarallax) {
-  this.progress = 0;
+  this.progress = -1;
   this.selector = selector;
   this.startValues = startValues;
   this.endValues = endValues;
@@ -368,6 +418,7 @@ JarallaxAnimation.prototype.activate = function (progress) {
     }
     
     if(progress >= start && progress <= end ){
+        
       for(i in this.startValues){
         if(i != 'progress' && i != 'style' && i != 'event')
         {
@@ -434,9 +485,79 @@ JarallaxAnimation.prototype.dispatchEvent = function(progress_old, progress_new,
     }
     
     if(events.rewinded && progress_old > start && progress_new < start) {
-      event_data.type = 'rewinded';
+      event_data.type = 'rewind';
       events.rewinded(event_data);
     }
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Jarallax counter class //////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+JarallaxCounter = function(jarallax, properties){
+  if(!properties){
+    throw new Error('No properties defined.');
+  }else if(!properties.selector){
+    throw new Error('No selector defined. properties.selector.');
+  }
+  
+  this.jarallax = jarallax;
+  this.selector = properties.selector;
+  this.startNumber = properties.startNumber || 0;
+  this.endNumber = properties.endNumber || 100;
+  this.startProgress = properties.startProgress || '0%';
+  this.endProgress = properties.endProgress || '100%';
+  this.decimals = properties.decimals || 0;
+  this.stepSize = properties.stepSize;
+  this.postCharakter = properties.postCharakter || '';
+  
+  
+  
+  
+  if(this.decimals == 0 && this.stepSize < 1){
+    tmp = this.stepSize.toString().split('.')
+    this.decimals = tmp[1].length;
+  }
+}
+
+JarallaxCounter.prototype.activate = function(){
+  var rawDiff = this.endNumber - this.startNumber;
+  var rawNumber = rawDiff * this.jarallax.progress + this.startNumber;
+  
+  
+  
+  if(this.startProgress.indexOf('%') >= 0) {
+    start = parseInt(this.startProgress,10) / 100;
+  }else if(hasNumbers(this.startProgress)){
+    start = parseInt(this.startProgress,10) / this.jarallax.maxProgress;
+  }
+  
+  if(this.endProgress.indexOf('%') >= 0)
+  {
+    end = parseInt(this.endProgress,10) / 100;
+  }else if(hasNumbers(this.endProgress)){
+    end = parseInt(this.endProgress,10) / this.jarallax.maxProgress;
+  }
+  
+  if(this.jarallax.progress < start){
+    $(this.selector).html(this.startNumber + this.postCharakter);
+  }else if(this.jarallax.progress > end){
+    $(this.selector).html(this.endNumber + this.postCharakter);
+  } else {
+    var duration = end - start;
+    var currentTime = (this.jarallax.progress-start);
+    var changeInValue = this.endNumber - this.startNumber ;
+    var result =  Jarallax.EASING['none'](currentTime, this.startNumber , changeInValue, duration);
+    
+    if(this.stepSize){
+      result = Math.round(result / this.stepSize) * this.stepSize;
+    }
+    
+    if(this.decimals > 0){
+      result = result.toFixed(this.decimals)  
+    }
+    
+    $(this.selector).html(result + this.postCharakter);
   }
 }
 
@@ -494,10 +615,12 @@ JarallaxStatic.prototype.activate = function(position) {
 // Scroll controller ///////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ControllerScroll = function(smoothing){
-  this.height = parseInt(jQuery("body").css("height"),10);
+  this.height = parseInt($("body").css('height'),10);
   this.target = $(window);
   this.scrollSpace = this.height - this.target.height();
-  this.smoothing = smoothing | false;
+  
+  this.smoothing = smoothing || navigator.userAgent.toLowerCase().indexOf( "safari" ) == -1;
+  
   this.timer;
   this.targetProgress = 0;
 };
@@ -517,8 +640,9 @@ ControllerScroll.prototype.onScroll = function(event){
   var y = controller.target.scrollTop();
   var progress = y/controller.scrollSpace;
   
+  
   if(!controller.smoothing){
-    controller.jarallax.setProgress(progress);
+    controller.jarallax.setProgress(progress, true);
   }else{
     controller.targetProgress = progress;
     controller.smooth();
@@ -526,8 +650,6 @@ ControllerScroll.prototype.onScroll = function(event){
 };
 
 ControllerScroll.prototype.smooth = function(){
-  
-
   var oldProgress = this.jarallax.progress;
   
   var animationSpace =  this.targetProgress - oldProgress;
@@ -537,16 +659,18 @@ ControllerScroll.prototype.smooth = function(){
     var newProgress = oldProgress + animationSpace / 5;
     
     this.timer = window.setTimeout(this.smooth.bind(this), 30);
-    this.jarallax.setProgress(newProgress);
+    this.jarallax.setProgress(newProgress, true);
   }else{
-    this.jarallax.setProgress(this.targetProgress);
+    this.jarallax.setProgress(this.targetProgress, true);
   }
 }
 
 ControllerScroll.prototype.update = function(progress){
   var scrollPosition = progress * this.scrollSpace;
   
-  $('body').scrollTop(scrollPosition);
+  if(!this.jarallax.allowWeakProgress) {
+    $('body').scrollTop(scrollPosition);
+  }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
