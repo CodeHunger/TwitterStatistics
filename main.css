@@ -565,3 +565,10 @@ width: 574px;
 height: 129px;
 background:url(img/line_5.png);
 }
+
+.share_buttons{
+position: fixed;
+bottom: 0px;
+z-index: 100;
+right:10px
+}
